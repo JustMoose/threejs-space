@@ -23,6 +23,8 @@ class Camera extends Component {
     Update() {
         this.rotation = this.parent.rotation;
         this.camera.setRotationFromQuaternion(this.rotation);
+        this.position = this.parent.position;
+        this.camera.position.copy(this.parent.position);
 
     }
 }

@@ -10,6 +10,7 @@ const _unlockEvent = { type: 'unlock' };
 
 const _PI_2 = Math.PI / 2;
 
+
 class Controller extends Component { //EventDispatcher {
 
     constructor( object, domElement ) {
@@ -18,6 +19,7 @@ class Controller extends Component { //EventDispatcher {
         this.SetParent(object);
         this.Init(domElement)
         this.Connect();
+        
     }
 
     Init(domElement ) {
@@ -31,7 +33,10 @@ class Controller extends Component { //EventDispatcher {
         this.input = this.GetComponent('Input');
 
         this.domElement = domElement;
-        this.isLocked = true;
+        this.isLocked = false;
+
+        this.direction = new THREE.Vector3();
+        this.velocity = new THREE.Vector3();
 
         // Set to constrain the pitch of the object
         // Range is 0 to Math.PI radians
@@ -51,7 +56,17 @@ class Controller extends Component { //EventDispatcher {
         this.domElement.ownerDocument.removeEventListener( 'pointerlockerror', this.onPointerlockError.bind(this) );
     };
 
-    Update() {
+    Update( delta ) {
+        this.direction.z = Number( this.input.moveForward ) - Number( this.input.moveBackward );
+        this.direction.x = Number( this.input.moveRight ) - Number( this.input.moveLeft );
+        this.direction.normalize(); // this ensures consistent movements in all directions
+        if ( this.input.moveForward || this.input.moveBackward ) this.velocity.z -= this.direction.z * 400.0 * delta;
+        if ( this.input.moveLeft || this.input.moveRight ) this.velocity.x -= this.direction.x * 400.0 * delta;
+        this.moveRight( - this.velocity.x * delta );
+        this.moveForward( - this.velocity.z * delta );
+        //TODO: Remove this and add damping!
+        this.velocity.x = 0
+        this.velocity.z = 0;
     }
 
     onMouseMove( event ) {
@@ -99,14 +114,26 @@ class Controller extends Component { //EventDispatcher {
     moveForward( distance ) {
         // move forward parallel to the xz-plane
         // assumes object.up is y-up
-        _vector.setFromMatrixColumn( this.parent.matrix, 0 );
-        _vector.crossVectors( this.parent.up, _vector );
-        this.parent.position.addScaledVector( _vector, distance );
+        // _vector.setFromMatrixColumn( this.parent.matrix, 0 );
+        // _vector.crossVectors( this.parent.up, _vector );
+        // this.parent.position.addScaledVector( _vector, distance );
+        const tempVector = new THREE.Vector3( 0, 0, -1 );
+        tempVector.applyQuaternion(this.parent.rotation);
+        tempVector.y = 0;
+        tempVector.normalize;
+        // FIXME: Eliminate the up down movement
+        //tempVector.crossVectors( this.parent.up, tempVector );
+        this.parent.position.addScaledVector( tempVector, distance );
     };
 
     moveRight( distance ) {
-        _vector.setFromMatrixColumn( this.parent.matrix, 0 );
-        this.parent.position.addScaledVector( _vector, distance );
+        // _vector.setFromMatrixColumn( this.parent.matrix, 0 );
+        // this.parent.position.addScaledVector( _vector, distance );
+        const tempVector = new THREE.Vector3( 1, 0, 0 );
+        tempVector.applyQuaternion(this.parent.rotation);
+        tempVector.y = 0;
+        tempVector.normalize;
+        this.parent.position.addScaledVector( tempVector, distance );
     };
 
     lock() {

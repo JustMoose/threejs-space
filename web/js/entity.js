@@ -12,6 +12,8 @@ class Entity {
         this.rotation = new THREE.Quaternion();
 
         this.parent = null;
+
+        this.up = new THREE.Vector3(0, 1, 0);
     }
 
     SetParent(o) {
@@ -37,6 +39,7 @@ class Entity {
     SetName(n) {
         this.name = n;
     }
+
 
 };
 

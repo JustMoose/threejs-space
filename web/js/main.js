@@ -41,8 +41,12 @@ function init() {
     entityManager.Add(player);
     camera = new Camera( player, renderer.domElement )
     player.AddComponent(camera);
-    player.AddComponent(new Input( player, renderer.domElement ));
-    player.AddComponent(new Controller( player, renderer.domElement ));
+    input = new Input( player, renderer.domElement )
+    player.AddComponent(input);
+    controls = new Controller( player, renderer.domElement )
+    player.AddComponent(controls);
+
+    window.addEventListener( 'click', function () {controls.lock();});
 
     //input = new Input( player, renderer.domElement );
     //controls = new Controller( player, renderer.domElement );
