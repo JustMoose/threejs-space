@@ -10,13 +10,12 @@ const _unlockEvent = { type: 'unlock' };
 
 const _PI_2 = Math.PI / 2;
 
-class Input extends Component {
+class PlayerEntity extends Entity {
 
-    constructor( object, domElement ) {
+    constructor() {
         super();
-        this.SetParent(object);
     }
 
 }
 
-export { Input };
+export { PlayerEntity };
